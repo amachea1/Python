@@ -9,9 +9,6 @@ This project is a simple tool that creates unique names for EC2 instances. It he
 - Generates unique names using random letters and numbers
 - Restricts usage to approved departments only
 
-## Allowed Departments
-- Cloud Engineering
-- FinOps
 
 If another department is entered, the tool will not generate names.
 
