@@ -31,7 +31,7 @@ jobs:
 
       - name: Send audit log to CloudWatch
         run: |
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
           MILLIS=$(date +%s%3N)
 
           aws logs create-log-stream \
