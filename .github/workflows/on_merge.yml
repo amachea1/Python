@@ -1,0 +1,44 @@
+name: Required Files Check (Prod)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-and-log:
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run file presence check
+        run: python check_required_files.py
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Send audit log to CloudWatch
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          MILLIS=$(date +%s%3N)
+
+          aws logs create-log-stream \
+            --log-group-name "${{ secrets.LOG_GROUP_NAME }}" \
+            --log-stream-name "$TIMESTAMP"
+
+          aws logs put-log-events \
+            --log-group-name "${{ secrets.LOG_GROUP_NAME }}" \
+            --log-stream-name "$TIMESTAMP" \
+            --log-events timestamp=$MILLIS,message="Workflow=${{ github.workflow }} SHA=${{ github.sha }} Actor=${{ github.actor }} Time=$TIMESTAMP"
