@@ -1,14 +1,19 @@
-# EC2 Random Name Generator
+# Python & Cloud Engineering Projects
 
-## Overview
-This project is a simple tool that creates unique names for EC2 instances. It helps teams in a shared environment easily identify which instances belong to which department.
+This repository contains hands-on projects from my cloud engineering learning journey. Each project explores a different concept — Python scripting, AWS services, GitHub Actions automation — and is documented in its own file.
 
-## What It Does
-- Allows the user to enter their department
-- Allows the user to choose how many names to generate
-- Generates unique names using random letters and numbers
-- Restricts usage to approved departments only
+## Projects
 
+### EC2 Random Name Generator
 
-If another department is entered, the tool will not generate names.
+A Python command-line tool that generates unique EC2 instance names for teams sharing an AWS environment.
+
+Detailed docs: [EC2_NAME_GENERATOR.md](EC2_NAME_GENERATOR.md)
+
+### Required File Presence Checker
+
+A CI/CD pipeline using GitHub Actions and AWS CloudWatch. Validates that every push to `main` and every pull request includes baseline files, and audit-logs successful runs to environment-specific CloudWatch log groups.
+
+Detailed docs: [REQUIRED_FILES_CHECKER.md](REQUIRED_FILES_CHECKER.md)
+
 
