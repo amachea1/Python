@@ -47,4 +47,4 @@ jobs:
           aws logs put-log-events \
             --log-group-name "${{ secrets.LOG_GROUP_NAME }}" \
             --log-stream-name "$TIMESTAMP" \
-            --log-events timestamp=$MILLIS,message="$MESSAGE"
+            --log-events "[{\"timestamp\":$MILLIS,\"message\":\"$MESSAGE\"}]"
