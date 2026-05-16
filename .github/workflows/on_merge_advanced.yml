@@ -1,0 +1,50 @@
+name: Required Files Check Advanced (Prod)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-and-log:
+    runs-on: ubuntu-latest
+    environment: prod-advanced
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Run advanced file presence check
+        id: file-check
+        run: python REQUIRED_FILES_CHECKER_ADVANCED/REQUIRED_FILES_CHECKER_ADVANCED.py
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Send enriched audit log to CloudWatch
+        run: |
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
+          MILLIS=$(date +%s%3N)
+
+          MESSAGE="Workflow=${{ github.workflow }} Repo=${{ github.repository }} Branch=${{ github.ref_name }} Event=${{ github.event_name }} SHA=${{ github.sha }} Actor=${{ github.actor }} Time=$TIMESTAMP RequiredFiles=${{ steps.file-check.outputs.required_files }} PresentFiles=${{ steps.file-check.outputs.present_files }} MissingFiles=${{ steps.file-check.outputs.missing_files }}"
+
+          aws logs create-log-stream \
+            --log-group-name "${{ secrets.LOG_GROUP_NAME }}" \
+            --log-stream-name "$TIMESTAMP"
+
+          aws logs put-log-events \
+            --log-group-name "${{ secrets.LOG_GROUP_NAME }}" \
+            --log-stream-name "$TIMESTAMP" \
+            --log-events timestamp=$MILLIS,message="$MESSAGE"
