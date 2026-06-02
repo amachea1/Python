@@ -1,0 +1,40 @@
+name: Deploy to Production (Merge to Main)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-prod:
+    name: Zip, Upload, and Deploy to Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Zip Lambda function
+        run: zip function.zip LAMBDA_EC2_SHUTDOWN/lambda_function.py
+
+      - name: Upload Lambda zip to S3 (Production)
+        run: |
+          aws s3 cp function.zip s3://${{ secrets.S3_BUCKET_PROD }}/${{ secrets.S3_PATH_PROD }}
+
+      - name: Deploy to Production via CloudFormation
+        run: |
+          aws cloudformation deploy \
+            --stack-name ${{ secrets.CF_STACK_NAME_PROD }} \
+            --template-file LAMBDA_EC2_SHUTDOWN/infrastructure/cloudformation/lambda-ec2-shutdown.yml \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --parameter-overrides \
+              LambdaFunctionName=${{ secrets.LAMBDA_NAME_PROD }} \
+              LambdaCodeBucket=${{ secrets.S3_BUCKET_PROD }} \
+              LambdaCodeKey=${{ secrets.S3_PATH_PROD }}
