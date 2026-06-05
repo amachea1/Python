@@ -32,7 +32,7 @@ jobs:
         run: |
           aws cloudformation deploy \
             --stack-name ${{ secrets.CF_STACK_NAME_BETA }} \
-            --template-file LAMBDA_EC2_SHUTDOWN/infrastructure/cloudformation/lambda-ec2-shutdown.yml \
+            --template-file lambda-ec2-shutdown.yml \
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides \
               LambdaFunctionName=${{ secrets.LAMBDA_NAME_BETA }} \
