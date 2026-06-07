@@ -22,9 +22,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Zip Lambda function
-        run:  |
-              cd LAMBDA_EC2_SHUTDOWN
-               zip ../function.zip lambda_function.py
+        run: |
+          cd LAMBDA_EC2_SHUTDOWN && zip -j ../function.zip lambda_function.py && cd ..
 
       - name: Upload Lambda zip to S3 (Beta)
         run: |
