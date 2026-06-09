@@ -8,6 +8,9 @@ on:
 jobs:
   synthesize-prod:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Polly
 
     steps:
       - name: Checkout Repository
