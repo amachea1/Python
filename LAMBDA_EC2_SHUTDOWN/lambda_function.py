@@ -1,3 +1,4 @@
+# EC2 Shutdown Lambda - LevelUp Bank
 import boto3
 
 def lambda_handler(event, context):

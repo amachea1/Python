@@ -22,7 +22,11 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Zip Lambda function
-        run: zip function.zip lambda_function.py
+        run: |
+          cd LAMBDA_EC2_SHUTDOWN && zip -j ../function.zip lambda_function.py && cd ..
+
+      - name: Check zip contents
+        run: unzip -l function.zip
 
       - name: Upload Lambda zip to S3 (Beta)
         run: |
@@ -32,7 +36,7 @@ jobs:
         run: |
           aws cloudformation deploy \
             --stack-name ${{ secrets.CF_STACK_NAME_BETA }} \
-            --template-file infrastructure/cloudformation/lambda-ec2-shutdown.yml \
+            --template-file LAMBDA_EC2_SHUTDOWN/infrastructure/cloudformation/lambda-ec2-shutdown.yml \
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides \
               LambdaFunctionName=${{ secrets.LAMBDA_NAME_BETA }} \
